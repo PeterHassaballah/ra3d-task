@@ -8,7 +8,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/PeterHassaballah/ra3d-task.git"
+    "url": "git+https://github.com/PeterHassaballah/ra3d-task.git",
+    "dev": "cross-env NODE_ENV=development nodemon ./dist/index.js",
+    "build": "tsc"
   },
   "keywords": [],
   "author": "",

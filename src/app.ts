@@ -4,6 +4,8 @@ import { Server, Socket } from "socket.io";
 import bodyParser from "body-parser";
 import compression from "compression";
 import cors from "cors";
+import dotenv from 'dotenv';
+dotenv.config();
 import { indexRoute } from "./routes/v1/index";
 import {authLimiter} from './middlewares/rateLimiter';
 console.log("hello world")

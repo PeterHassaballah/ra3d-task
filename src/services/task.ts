@@ -1,6 +1,6 @@
 import Task from '../models/task'; 
-import { ITask } from 'src/types/task.interface';
-import ApiError from 'src/utils/ApiError';
+import { ITask } from '../types/task.interface';
+import ApiError from '../utils/ApiError';
 
 // Get all tasks
 export const getAllTasks = async (): Promise<ITask[]> => {

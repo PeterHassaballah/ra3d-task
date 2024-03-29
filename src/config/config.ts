@@ -4,7 +4,7 @@ import joi from "joi";
 const envVarsSchema = joi
   .object()
   .keys({
-    NODE_ENV: joi.string().valid("production", "development", "test").required(),
+    NODE_ENV: joi.string().valid("production", "development", "test","local").required(),
     PORT: joi.number().default(3000),
     MONGODB_URL: joi.string().required().description("Mongo DB url"),
     JWT_SECRET: joi.string().required().description("JWT secret key"),

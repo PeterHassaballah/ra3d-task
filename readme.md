@@ -20,21 +20,20 @@
 - **Validation**: request data validation using [Joi](https://github.com/hapijs/joi)
 - **Testing**: unit and integration tests using [Jest](https://jestjs.io)
 - **Error handling**: centralized error handling mechanism
-- **API documentation**: with [swagger-jsdoc](https://github.com/Surnet/swagger-jsdoc) and [swagger-ui-express](https://github.com/scottie1984/swagger-ui-express)
-- **Process management**: advanced production process management using [PM2](https://pm2.keymetrics.io)
-- **Dependency management**: with [Yarn](https://yarnpkg.com)
 - **Environment variables**: using [dotenv](https://github.com/motdotla/dotenv) and [cross-env](https://github.com/kentcdodds/cross-env#readme)
 - **Santizing**: sanitize request data against xss and query injection
 - **CORS**: Cross-Origin Resource-Sharing enabled using [cors](https://github.com/expressjs/cors)
 - **Compression**: gzip compression with [compression](https://github.com/expressjs/compression)
-- **Docker support**
-- **Git hooks**: with [husky](https://github.com/typicode/husky) and [lint-staged](https://github.com/okonet/lint-staged)
-- **Linting**: with [ESLint](https://eslint.org) and [Prettier](https://prettier.io)
+
 
 ## Commands
 
-Running locally:
-
+Running locally:<br></br>
+First you need to build using :
+```bash
+npm run build
+```
+then you can run using 
 ```bash
 yarn dev
 ```
@@ -144,14 +143,14 @@ List of available routes:
 
 The app has a centralized error handling mechanism.
 
-Controllers should try to catch the errors and forward them to the error handling middleware (by calling `next(error)`). For convenience, you can also wrap the controller inside the catchAsync utility wrapper, which forwards the error.
+Controllers should try to catch the errors and forward them to the error handling middleware (by calling `next(error)`). 
 
 ```javascript
-const catchAsync = require('../utils/catchAsync');
 
-const controller = catchAsync(async (req, res) => {
+
+const controller = functionName(async (req, res) => {
   // this error will be forwarded to the error handling middleware
-  throw new Error('Something wrong happened');
+  throw new ApiError('Something wrong happened');
 });
 ```
 
@@ -160,13 +159,13 @@ The error handling middleware sends an error response, which has the following f
 ```json
 {
   "code": 404,
-  "message": "Not found"
+  "message": "Not found",
+  "isOperational":false,
+  "stack":"Error stack if it exists"
 }
 ```
 
 When running in development mode, the error response also contains the error stack.
-
-The app has a utility ApiError class to which you can attach a response code and a message, and then throw it from anywhere (catchAsync will catch it).
 
 For example, if you are trying to get a user from the DB who is not found, and you want to send a 404 error, the code should look something like:
 
@@ -177,7 +176,7 @@ const User = require('../models/User');
 const getUser = async (userId) => {
   const user = await User.findById(userId);
   if (!user) {
-    throw new ApiError(404, 'User not found');
+    throw new ApiError(404, 'User not found',false);
   }
 };
 ```

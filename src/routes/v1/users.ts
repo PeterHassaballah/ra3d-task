@@ -12,7 +12,6 @@ import {
 const upload = multer({   storage: multer.memoryStorage(),}); 
 const router = Router();
 //routes
-//todo add auth mw to validate roles
 router
   .route("/")
   .post(validate(createUser), _createUser)

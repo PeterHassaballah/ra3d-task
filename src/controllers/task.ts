@@ -1,7 +1,7 @@
-import { RequestHandler } from 'express';
+import { RequestHandler,Response } from 'express';
 import * as taskService from '../services/task';
 import { Server } from 'socket.io';
-
+import {AuthenticatedRequest} from '../types/user.interface';
 let io: Server; // Assuming you have already initialized Socket.IO server
 
 export const getAllTasks: RequestHandler = async (req, res) => {
@@ -12,10 +12,11 @@ export const getAllTasks: RequestHandler = async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
-export const getTask: RequestHandler = async (req, res) => {
+export const getTask = async (req:AuthenticatedRequest, res:Response) => {
     try {
     const taskId = req.params.id;
-      const task = await taskService.getTaskById(taskId);
+    const userId = req.userId;
+    const task = await taskService.getTaskById(taskId,userId);
       if(!task){
           res.status(404).json({'message':'No matching Id found'});
       }
@@ -39,6 +40,19 @@ export const createTask: RequestHandler = async (req, res) => {
 };
 
 export const updateTask: RequestHandler = async (req, res) => {
+  const taskId = req.params.id;
+  try {
+    const updatedTask = await taskService.updateTask(taskId, req.body);
+    if(!updatedTask){
+
+    }
+    io.emit('taskUpdated', updatedTask);
+    res.json(updatedTask);
+  } catch (error) {
+    res.status(400).json({ message: 'Failed to update task' });
+  }
+};
+export const assignTask: RequestHandler = async (req, res) => {
   const taskId = req.params.id;
   try {
     const updatedTask = await taskService.updateTask(taskId, req.body);

@@ -4,13 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "cross-env NODE_ENV=development nodemon ./dist/index.js",
+    "build": "tsc"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/PeterHassaballah/ra3d-task.git",
-    "dev": "cross-env NODE_ENV=development nodemon ./dist/index.js",
-    "build": "tsc"
+    "url": "git+https://github.com/PeterHassaballah/ra3d-task.git"
   },
   "keywords": [],
   "author": "",

@@ -11,9 +11,20 @@ export const getAllTasks = async (): Promise<ITask[]> => {
     throw new ApiError(500,'Failed to fetch tasks');
   }
 };
-export const getTaskById = async(taskId:string):Promise<ITask>=>{
+export const getTaskById = async(taskId:string,uId:string):Promise<ITask>=>{
+    try{
+      
     const task = await Task.findById(taskId);
-    return task;
+    // check if userId owns the task
+    if(task.assignedBy===uId || task.userId===uId){
+      // user is either assignee or owner
+      return task;
+    }
+    throw new ApiError(403,'User not authorized to access task',false);
+    }
+    catch(err){
+      throw new ApiError(500,'Failed to find task');
+    }
 }
 // Create a new task
 export const createTask = async (taskData: Partial<ITask>): Promise<ITask> => {

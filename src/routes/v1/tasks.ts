@@ -1,23 +1,27 @@
 import { Router } from "express";
 import validate from "../../middlewares/validate";
 import { createTask,updateTask } from "../../validations/task";
+import {auth,extractUserId} from "../../middlewares/auth";
 import {
   createTask as _createTask,
   getAllTasks as _getTasks,
   getTask as _getTask,
   updateTask as _updateTask,
+  assignTask
 } from "../../controllers/task"; 
 const router = Router();
-//routes
+//routes to get/create tasks
 router
   .route("/")
-  .post(validate(createTask), _createTask)
-  .get( _getTasks);
-// uploading json to create tasks
+  .post(auth,validate(createTask), _createTask)
+  .get(auth, _getTasks);
+  // assign task
+router.patch("/:taskId/assign",auth,assignTask);
+// update/get task
 router
   .route("/:taskId")
-  .get( _getTask)
-  .patch(validate(updateTask), _updateTask);
+  .get(auth,extractUserId, _getTask)
+  .patch(auth,validate(updateTask), _updateTask);
 
 //export authRoute
 export default router;

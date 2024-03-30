@@ -1,7 +1,7 @@
 import Task from '../models/task'; 
 import { ITask } from '../types/task.interface';
 import ApiError from '../utils/ApiError';
-
+import dayjs from 'dayjs';
 // Get all tasks
 export const getAllTasks = async (): Promise<ITask[]> => {
   try {
@@ -29,13 +29,17 @@ export const getTaskById = async(taskId:string,uId:string):Promise<ITask>=>{
 // Create a new task
 export const createTask = async (taskData: Partial<ITask>): Promise<ITask> => {
   try {
+    if(!taskData.dueDate){
+      const currentDate = dayjs();
+      taskData.dueDate= currentDate.add(1, 'week').toDate();
+    }
     const newTask = await Task.create(taskData);
     if(!newTask){
-        throw new ApiError(500,'Failed to create task');
+        throw new ApiError(500,'Task Creation failed');
     }
     return newTask;
-  } catch (error) {
-    throw new ApiError(500,'Failed to create task');
+  } catch (error:any) {
+    throw new ApiError(500,'Failed to create task',true,error?.message);
   }
 };
 

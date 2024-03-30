@@ -4,7 +4,7 @@ import { ITask } from '../types/task.interface';
 const taskSchema = new mongoose.Schema<ITask>({
     title: { type: String, required: true },
     description: { type: String},
-    userId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User' },   // this will hold the current userId
+    userId: { type: mongoose.Schema.Types.ObjectId,  ref: 'User' },   // this will hold the current userId
     assignedBy: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User' },   // this will hold the userId by whom the task was assigned
     status: { type: String, enum: ["pending", "inProgress", "completed"], default: "pending" },
     priority: { type: String, enum: ["low", "medium", "high"], default: "medium" },

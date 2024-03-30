@@ -1,7 +1,8 @@
 import { RequestHandler,Response } from 'express';
 import * as taskService from '../services/task';
 import { Server } from 'socket.io';
-import {AuthenticatedRequest} from '../types/user.interface';
+import { AuthenticatedRequest } from 'src/types/user.interface';
+// import {AuthenticatedRequest} from '../types/user.interface';
 let io: Server; // Assuming you have already initialized Socket.IO server
 
 export const getAllTasks: RequestHandler = async (req, res) => {
@@ -12,10 +13,10 @@ export const getAllTasks: RequestHandler = async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
-export const getTask = async (req:AuthenticatedRequest, res:Response) => {
+export const getTask:RequestHandler = async (req, res) => {
     try {
     const taskId = req.params.id;
-    const userId = req.userId;
+    const userId = 'req.user';
     const task = await taskService.getTaskById(taskId,userId);
       if(!task){
           res.status(404).json({'message':'No matching Id found'});
@@ -26,16 +27,19 @@ export const getTask = async (req:AuthenticatedRequest, res:Response) => {
     }
   };
 
-export const createTask: RequestHandler = async (req, res) => {
+export const createTask = async (req:AuthenticatedRequest, res:Response) => {
   try {
-    const newTask = await taskService.createTask(req.body);
-    if(!newTask){
-        
+    const payload=req.body;
+    const userId = req.userId;
+    const newTask = await taskService.createTask({...payload,assignedBy:userId});
+    if(!newTask){      
+      res.status(400).json({ message: 'Failed to create task' });
     }
     io.emit('taskAdded', newTask);
     res.status(201).json(newTask);
-  } catch (error) {
-    res.status(400).json({ message: 'Failed to create task' });
+  } catch (error:any) {
+    console.log("the error",error);
+    res.status(400).json({ message: `Error in Taskcreation: ${error.message}` });
   }
 };
 

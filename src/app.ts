@@ -8,7 +8,8 @@ import dotenv from 'dotenv';
 dotenv.config();
 import { indexRoute } from "./routes/v1/index";
 import {authLimiter} from './middlewares/rateLimiter';
-console.log("hello world")
+import jwtStrategy from './config/passport';
+console.log("hello world we are here:",process.env.PORT)
 const app = express();
 // Socket.io server
 const server = http.createServer(app);
@@ -34,6 +35,8 @@ io.on("connection", (socket: Socket) => {
   });
 // parse json request body
 app.use(json());
+//jwt strategy
+app.use(jwtStrategy.initialize());
 // gzip compression
 app.use(compression());
 // body parser

@@ -1,5 +1,5 @@
 // update the passport version that supports es6
-import { Response, NextFunction } from 'express';
+import { Response, NextFunction,RequestHandler } from 'express';
 import passport from "passport";
 import {AuthenticatedRequest} from '../types/user.interface';
 // Define a custom interface for the authenticated request
@@ -15,7 +15,7 @@ const verifyCallback = (req, resolve, reject) => async (err, user, info) => {
   resolve();
 };
 
-export const auth =  async (req:AuthenticatedRequest, res:Response, next:NextFunction) => {
+export const auth:RequestHandler =  async (req, res, next) => {
     return new Promise((resolve, reject) => {
       passport.authenticate("jwt", { session: false }, verifyCallback(req, resolve, reject))(req, res, next);
     })

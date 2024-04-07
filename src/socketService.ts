@@ -1,27 +1,26 @@
 import { Server, Socket } from 'socket.io';
+import { createNotification } from './services/notifications';
+import { ITask } from './types/task.interface';
 
 // Function to handle new notification event
-function handleNewNotification(io: Server, socket: Socket, notification: any) {
-    io.emit('newNotification', notification);
-}
+// function handleNewNotification(io: Server, socket: Socket, notification: any) {
+//     io.emit('newNotification', notification);
+// }
 
 // Export Socket.io event handlers
 export function initializeSocket(io: Server) {
     io.on('connection', (socket: Socket) => {
         console.log('A user connected');
-
-        // Listen for 'newNotification' event
-        socket.on('newNotification', (notification: any) => {
-            handleNewNotification(io, socket, notification);
-        });
         // Handle taskAdded (assigned) event
-        socket.on("taskAdded", (taskId: string) => {
-            io.emit("taskAdded", `Task added: ${taskId}`);
+        socket.on("taskAssigned", (task:ITask) => {
+            //create task assigned notification
+            createNotification(`Task ${task._id} assigned to you`,task.userId);
         });
 
         // Handle taskUpdated event
-        socket.on("taskUpdated", (taskId: string) => {
-            io.emit("taskUpdated", `Task updated: ${taskId}`);
+        socket.on("taskUpdated", (task:ITask) => {
+            //create assigned task updated notification
+            createNotification(`Task ${task._id} updated`,task.userId);
         });
 
     });

@@ -1,6 +1,6 @@
-import express, { json, urlencoded } from "express";
+import express, { json, urlencoded,Response,NextFunction } from "express";
 import http from "http";
-import { Server, Socket } from "socket.io";
+import { Server } from "socket.io";
 import bodyParser from "body-parser";
 import compression from "compression";
 import cors from "cors";
@@ -9,30 +9,19 @@ dotenv.config();
 import { indexRoute } from "./routes/v1/index";
 import {authLimiter} from './middlewares/rateLimiter';
 import jwtStrategy from './config/passport';
+import { initializeSocket } from "./socketService";
+import { AuthenticatedRequest } from "./types/user.interface";
 console.log("hello world we are here:",process.env.PORT)
 const app = express();
 // Socket.io server
 const server = http.createServer(app);
 const io = new Server(server);
-io.on("connection", (socket: Socket) => {
-    console.log("Socket.IO connection established");
-  
-    socket.on("message", (data: any) => {
-      console.log("received:", data);
-    });
-  
-    socket.emit("message", "hello from server");
-  
-    // Handle taskAdded (assigned) event
-    socket.on("taskAdded", (taskId: string) => {
-      io.emit("taskAdded", `Task added: ${taskId}`);
-    });
-  
-    // Handle taskUpdated event
-    socket.on("taskUpdated", (taskId: string) => {
-      io.emit("taskUpdated", `Task updated: ${taskId}`);
-    });
-  });
+
+initializeSocket(io);
+app.use((req:AuthenticatedRequest, res:Response, next:NextFunction) => {
+  req.io = io; // Attach io to the request object
+  next();
+});
 // parse json request body
 app.use(json());
 //jwt strategy
@@ -57,7 +46,7 @@ app.use((req, res, next) => {
 // convert error to ApiError, if needed
 // app.use(errorConverter);
 
-// // handle error
+//  handle error
 // app.use(errorHandler);
 
 export default app;

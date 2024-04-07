@@ -3,17 +3,14 @@ import app from "./app";
 const port = process.env.PORT ? process.env.PORT : 3000;
 let server;
 
-mongoose.connect(process.env.MONGODB_URL, { useNewUrlParser: true, useUnifiedTopology: true }).then(() => {
+mongoose.connect(process.env.MONGODB_URL, { 
+  useNewUrlParser: true, useFindAndModify:true, useUnifiedTopology: true
+ }).then(() => {
   server = app.listen(port, () => {
     console.log(`Listening to port ${port}`);
   });
 });
-// connect(mongoose.url, _mongoose.options).then(() => {
-//   info('Connected to MongoDB');
-//   server = listen(port, () => {
-//     info(`Listening to port ${port}`);
-//   });
-// });
+
 
 const exitHandler = () => {
   if (server) {

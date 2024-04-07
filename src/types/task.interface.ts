@@ -7,4 +7,5 @@ export interface ITask extends Document {
   status: 'pending' | 'inProgress' | 'completed';
   priority: 'low' | 'medium' | 'high';
   dueDate: Date;
+  _id?:string;
 }

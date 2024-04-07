@@ -1,4 +1,5 @@
 import { Request } from 'express';
+import { Server } from 'socket.io';
 export interface IUser {
   _id?: string;
   name: string;
@@ -9,4 +10,5 @@ export interface IUser {
 export interface AuthenticatedRequest extends Request {
   user?: IUser;
   userId?: string;
+  io?:Server;
 }

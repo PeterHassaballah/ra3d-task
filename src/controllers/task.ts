@@ -12,7 +12,7 @@ export const getAllTasks: RequestHandler = async (req, res) => {
 };
 export const getTask:RequestHandler = async (req, res) => {
     try {
-    const taskId = req.params.id;
+    const taskId = req.params.taskId;
     const userId = 'req.user';
     const task = await taskService.getTaskById(taskId,userId);
       if(!task){
@@ -50,7 +50,7 @@ export const getUserTasks = async (req:AuthenticatedRequest, res:Response) => {
 };
 
 export const updateTask = async (req:AuthenticatedRequest, res:Response) => {
-  const taskId = req.params.id;
+  const taskId = req.params.taskId;
   try {
     const updatedTask = await taskService.updateTask(taskId, req.body);
     if(!updatedTask){
@@ -65,10 +65,8 @@ export const updateTask = async (req:AuthenticatedRequest, res:Response) => {
   }
 };
 export const assignTask = async (req:AuthenticatedRequest, res:Response) => {
-  const taskId = req.params.id;
+  const taskId = req.params.taskId;
   try {
-    console.log("The task id ",taskId);
-    console.log("The Body",req.body);
     const assignedTask = await taskService.assignToUser(taskId, req.body);
     if(!assignedTask){
       return res.status(400).json({message:'Error assigning task'});
@@ -81,7 +79,7 @@ export const assignTask = async (req:AuthenticatedRequest, res:Response) => {
 };
 
 export const deleteTask: RequestHandler = async (req, res) => {
-  const taskId = req.params.id;
+  const taskId = req.params.taskId;
   try {
     await taskService.deleteTask(taskId);
     return res.status(204).end();

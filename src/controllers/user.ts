@@ -2,7 +2,8 @@ import { RequestHandler,Response } from "express";
 import pick from "../utils/pick";
 import * as userService from "../services/user";
 import { validateJSON } from "../middlewares/user";
-
+import { getNotifcations } from "../services/notifications";
+import { AuthenticatedRequest } from "../types/user.interface";
 export const createUser: RequestHandler = async (req, res) => {
     try {
         const user = await userService.createUser(req.body);
@@ -77,6 +78,19 @@ export const createFromJson = async(req:any,res:Response)=>{
         console.log("error uploading users", err);
         return res.status(400).json({
             message: err,
+        });
+    }
+
+}
+export const getUserNotifications = async(req:AuthenticatedRequest,res:Response)=>{
+    try {
+        const userId = req.userId;
+        const result = getNotifcations(userId);
+        return res.status(200).json(result);
+    } catch (err) {
+        console.log("error getting notification", err);
+        return res.status(400).json({
+            message: "4N001",
         });
     }
 

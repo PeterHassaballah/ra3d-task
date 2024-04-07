@@ -3,7 +3,7 @@ import { getUserByEmail, getUserById, updateUserById } from "./user";
 import Token from "../models/token";
 import { tokenTypes } from "../config/tokens";
 import ApiError from "../utils/ApiError";
-import { IUser } from "src/types/user.interface";
+import { IUser } from "../types/user.interface";
 /**
  * Login with username and password
  * @param {string} email

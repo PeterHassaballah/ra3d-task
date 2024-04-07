@@ -11,6 +11,16 @@ export const getAllTasks = async (): Promise<ITask[]> => {
     throw new ApiError(500,'Failed to fetch tasks');
   }
 };
+export const getMyTasks =  async (uId:string): Promise<ITask[]> => {
+  try {
+    const tasks = await Task.find({$or: [
+      { userId: uId }, { assignedBy: uId }
+    ]});
+    return tasks;
+  } catch (error) {
+    throw new ApiError(500,'Failed to fetch tasks');
+  }
+};
 export const getTaskById = async(taskId:string,uId:string):Promise<ITask>=>{
     try{
       
@@ -64,3 +74,13 @@ export const deleteTask = async (taskId: string): Promise<void> => {
     throw new ApiError(500,'Failed to delete task');
   }
 };
+// assign task to user
+export const assignToUser = async (taskId:string,taskData:Partial<ITask>):Promise<ITask> =>{
+  try{
+    const updatedTask = await Task.findByIdAndUpdate(taskId, taskData, { new: true });
+    return updatedTask;
+  }
+  catch(err){
+    throw new ApiError(500,'Cannot assign task to user');
+  }
+}

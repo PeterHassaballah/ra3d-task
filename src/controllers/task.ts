@@ -1,16 +1,13 @@
 import { RequestHandler,Response } from 'express';
 import * as taskService from '../services/task';
-import { Server } from 'socket.io';
-import { AuthenticatedRequest } from 'src/types/user.interface';
-// import {AuthenticatedRequest} from '../types/user.interface';
-let io: Server; // Assuming you have already initialized Socket.IO server
+import {AuthenticatedRequest} from '../types/user.interface';
 
 export const getAllTasks: RequestHandler = async (req, res) => {
   try {
     const tasks = await taskService.getAllTasks();
-    res.status(200).json(tasks);
+    return res.status(200).json(tasks);
   } catch (error) {
-    res.status(500).json({ message: 'Internal server error' });
+    return res.status(500).json({ message: 'Internal server error' });
   }
 };
 export const getTask:RequestHandler = async (req, res) => {
@@ -19,11 +16,11 @@ export const getTask:RequestHandler = async (req, res) => {
     const userId = 'req.user';
     const task = await taskService.getTaskById(taskId,userId);
       if(!task){
-          res.status(404).json({'message':'No matching Id found'});
+          return res.status(404).json({'message':'No matching Id found'});
       }
-      res.status(200).json(task);
+      return res.status(200).json(task);
     } catch (error) {
-      res.status(500).json({ message: 'Internal server error' });
+      return res.status(500).json({ message: 'Internal server error' });
     }
   };
 
@@ -33,40 +30,53 @@ export const createTask = async (req:AuthenticatedRequest, res:Response) => {
     const userId = req.userId;
     const newTask = await taskService.createTask({...payload,assignedBy:userId});
     if(!newTask){      
-      res.status(400).json({ message: 'Failed to create task' });
+      return res.status(400).json({ message: 'Failed to create task' });
     }
-    io.emit('taskAdded', newTask);
-    res.status(201).json(newTask);
+    return res.status(201).json(newTask);
   } catch (error:any) {
     console.log("the error",error);
-    res.status(400).json({ message: `Error in Taskcreation: ${error.message}` });
+    return res.status(400).json({ message: `Error in Taskcreation: ${error.message}` });
+  }
+};
+export const getUserTasks = async (req:AuthenticatedRequest, res:Response) => {
+  try {
+    const userId = req.userId;
+    const tasks = await taskService.getMyTasks(userId);
+    return res.status(200).json(tasks);
+  } catch (error:any) {
+    console.log("the error",error);
+    return res.status(500).json({ message: `Cannot get user tasks ${error?.message}` });
   }
 };
 
-export const updateTask: RequestHandler = async (req, res) => {
+export const updateTask = async (req:AuthenticatedRequest, res:Response) => {
   const taskId = req.params.id;
   try {
     const updatedTask = await taskService.updateTask(taskId, req.body);
     if(!updatedTask){
 
     }
-    io.emit('taskUpdated', updatedTask);
-    res.json(updatedTask);
+    if(updatedTask.userId){
+      req.io.emit('taskUpdated', updatedTask);
+    }
+    return res.json(updatedTask);
   } catch (error) {
-    res.status(400).json({ message: 'Failed to update task' });
+    return res.status(400).json({ message: 'Failed to update task' });
   }
 };
-export const assignTask: RequestHandler = async (req, res) => {
+export const assignTask = async (req:AuthenticatedRequest, res:Response) => {
   const taskId = req.params.id;
   try {
-    const updatedTask = await taskService.updateTask(taskId, req.body);
-    if(!updatedTask){
-
+    console.log("The task id ",taskId);
+    console.log("The Body",req.body);
+    const assignedTask = await taskService.assignToUser(taskId, req.body);
+    if(!assignedTask){
+      return res.status(400).json({message:'Error assigning task'});
     }
-    io.emit('taskUpdated', updatedTask);
-    res.json(updatedTask);
+    req.io.emit('taskAssigned', assignedTask);
+    return res.status(200).json({data:assignedTask});
   } catch (error) {
-    res.status(400).json({ message: 'Failed to update task' });
+    return res.status(400).json({ message: 'Failed to update task' });
   }
 };
 
@@ -74,8 +84,8 @@ export const deleteTask: RequestHandler = async (req, res) => {
   const taskId = req.params.id;
   try {
     await taskService.deleteTask(taskId);
-    res.status(204).end();
+    return res.status(204).end();
   } catch (error) {
-    res.status(400).json({ message: 'Failed to delete task' });
+    return res.status(400).json({ message: 'Failed to delete task' });
   }
 };
